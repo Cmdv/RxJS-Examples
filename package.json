@@ -1,0 +1,24 @@
+{
+  "name": "rxjs-image-zoom",
+  "version": "1.0.0",
+  "description": "rxjs image zoom example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cmdv/rxjs-image-zoom.git"
+  },
+  "keywords": [
+    "rxjs",
+    "image",
+    "zoom"
+  ],
+  "author": "Vincent Orr",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Cmdv/rxjs-image-zoom/issues"
+  },
+  "homepage": "https://github.com/Cmdv/rxjs-image-zoom#readme"
+}
