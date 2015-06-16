@@ -4,21 +4,33 @@
   "description": "rxjs image zoom example",
   "main": "index.js",
   "scripts": {
+    "start": "webpack -wdc --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Cmdv/rxjs-image-zoom.git"
+    "url": "git+https://github.com/Cmdv/rxjs-image-zoom.git"
   },
   "keywords": [
     "rxjs",
     "image",
     "zoom"
   ],
-  "author": "Vincent Orr",
+  "author": "Vincent Orr <@_cmdv_> (http://github.com/cmdv)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Cmdv/rxjs-image-zoom/issues"
   },
-  "homepage": "https://github.com/Cmdv/rxjs-image-zoom#readme"
+  "homepage": "https://github.com/Cmdv/rxjs-image-zoom#readme",
+  "dependencies": {
+    "rx": "^2.5.3"
+  },
+  "devDependencies": {
+    "babel-core": "^5.1.11",
+    "babel-loader": "^5.0.0",
+    "babel-jest": "^5.0.1",
+    "react": "^0.13.2",
+    "rx": "^2.5.2",
+    "webpack": "^1.8.9"
+  }
 }
