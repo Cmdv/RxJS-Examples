@@ -1,3 +1,4 @@
 .idea
 node_modules
-build
+build/index.js
+build/index.js.map
