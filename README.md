@@ -1,5 +1,6 @@
-# rxjs image zoom
+# rxjs hover image zoom
 
-a quick play around of an hover show image zoomed in new div
+a quick play around at hover image zoom. 
+When hovering over the image the image is reproduced in new div zoomed in.
 
 [VIEW DEMO](http://cmdv.github.io/rxjs-image-zoom/)
