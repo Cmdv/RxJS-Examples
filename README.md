@@ -13,7 +13,7 @@ This is a playground of simple real life example of RxJS in action
 
 * Predictive search
 * Drag n Drop
-* Will think of more
+* add yours??
 
 If you have examples you'd like to add then please feel free to do so.
 The more the better but thinking not too advanced as this could be a great interime for beginers.
