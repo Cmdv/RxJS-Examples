@@ -2,7 +2,7 @@
 
 This is a playground of simple real life example of RxJS in action
 
-[VIEW DEMO](http://cmdv.github.io/rxjs-examples/)
+[VIEW DEMO](http://cmdv.github.io/RxJS-Examples)
 
 # Examples so far:
 
