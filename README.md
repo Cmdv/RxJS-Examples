@@ -1,4 +1,4 @@
-# rxjs Examples
+# RxJS Examples
 
 This is a playground of simple real life example of RxJS in action
 
