@@ -1,0 +1,25 @@
+#c_image {
+    width: 250px;
+    float: left;
+}
+
+#c_image img {
+    width: 100%;
+}
+
+#c_zoom {
+    position: relative;
+    float: left;
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    opacity: 0;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+}
+
+#c_zoom-image {
+    position: absolute;
+}
