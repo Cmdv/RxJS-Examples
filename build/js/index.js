@@ -62,13 +62,29 @@
 	 */
 	'use strict';
 	
+	__webpack_require__(/*! ./hover-zoom/hover-zoom */ 2);
+	__webpack_require__(/*! ./drag-drop/drag-drop */ 7);
+	__webpack_require__(/*! ./drag-drop-sort/drag-drop-sort */ 8);
+
+/***/ },
+/* 2 */
+/*!**************************************!*\
+  !*** ./src/hover-zoom/hover-zoom.js ***!
+  \**************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created by cmdv on 16/06/15.
+	 */
+	'use strict';
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _rx = __webpack_require__(/*! rx */ 2);
+	var _rx = __webpack_require__(/*! rx */ 3);
 	
 	var _rx2 = _interopRequireDefault(_rx);
 	
-	var _jquery = __webpack_require__(/*! jquery */ 5);
+	var _jquery = __webpack_require__(/*! jquery */ 6);
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
@@ -92,8 +108,8 @@
 	
 	var imageSubscribe = convert.subscribe(function (e) {
 	
-	  var top = e.top * -yRatio + offSets.top,
-	      left = e.left * -xRatio + offSets.left;
+	  var top = e.top * -yRatio + offSets.top * yRatio,
+	      left = e.left * -xRatio + offSets.left * xRatio;
 	
 	  $zoomImage.css({ left: left, top: top });
 	  $zoom.css({ opacity: 1 });
@@ -104,7 +120,7 @@
 	});
 
 /***/ },
-/* 2 */
+/* 3 */
 /*!*****************************!*\
   !*** ./~/rx/dist/rx.all.js ***!
   \*****************************/
@@ -10834,10 +10850,10 @@
 	
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/buildin/module.js */ 3)(module), (function() { return this; }()), __webpack_require__(/*! ./~/node-libs-browser/~/process/browser.js */ 4)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/buildin/module.js */ 4)(module), (function() { return this; }()), __webpack_require__(/*! ./~/node-libs-browser/~/process/browser.js */ 5)))
 
 /***/ },
-/* 3 */
+/* 4 */
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
   \***********************************/
@@ -10856,7 +10872,7 @@
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /*!**************************************************!*\
   !*** ./~/node-libs-browser/~/process/browser.js ***!
   \**************************************************/
@@ -10955,7 +10971,7 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /*!*********************************!*\
   !*** ./~/jquery/dist/jquery.js ***!
   \*********************************/
@@ -20172,6 +20188,112 @@
 	
 	}));
 
+
+/***/ },
+/* 7 */
+/*!************************************!*\
+  !*** ./src/drag-drop/drag-drop.js ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created by cmdv on 16/06/15.
+	 */
+	'use strict';
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _rx = __webpack_require__(/*! rx */ 3);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _jquery = __webpack_require__(/*! jquery */ 6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var $original = (0, _jquery2['default'])('#c_image'),
+	    $zoom = (0, _jquery2['default'])('#c_zoom'),
+	    $zoomImage = (0, _jquery2['default'])('#c_zoom-image'),
+	    targetWidth = $zoom.outerWidth(),
+	    targetHeight = $zoom.outerHeight(),
+	    originalWidth = $original.width(),
+	    originalHeight = $original.height(),
+	    xRatio = ($zoomImage.width() - targetWidth) / originalWidth,
+	    yRatio = ($zoomImage.height() - targetHeight) / originalHeight,
+	    offSets = $original.offset();
+	
+	var imageHover = _rx2['default'].Observable.fromEvent($original, 'mousemove');
+	var imageLeave = _rx2['default'].Observable.fromEvent($original, 'mouseleave');
+	
+	var convert = imageHover.map(function (hover) {
+	  return { left: hover.clientX, top: hover.clientY };
+	}).debounce(10);
+	
+	var imageSubscribe = convert.subscribe(function (e) {
+	
+	  var top = e.top * -yRatio + offSets.top * yRatio,
+	      left = e.left * -xRatio + offSets.left * xRatio;
+	
+	  $zoomImage.css({ left: left, top: top });
+	  $zoom.css({ opacity: 1 });
+	});
+	
+	imageLeave.subscribe(function () {
+	  $zoom.css({ opacity: 0 });
+	});
+
+/***/ },
+/* 8 */
+/*!**********************************************!*\
+  !*** ./src/drag-drop-sort/drag-drop-sort.js ***!
+  \**********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Created by cmdv on 16/06/15.
+	 */
+	'use strict';
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _rx = __webpack_require__(/*! rx */ 3);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _jquery = __webpack_require__(/*! jquery */ 6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var $original = (0, _jquery2['default'])('#c_image'),
+	    $zoom = (0, _jquery2['default'])('#c_zoom'),
+	    $zoomImage = (0, _jquery2['default'])('#c_zoom-image'),
+	    targetWidth = $zoom.outerWidth(),
+	    targetHeight = $zoom.outerHeight(),
+	    originalWidth = $original.width(),
+	    originalHeight = $original.height(),
+	    xRatio = ($zoomImage.width() - targetWidth) / originalWidth,
+	    yRatio = ($zoomImage.height() - targetHeight) / originalHeight,
+	    offSets = $original.offset();
+	
+	var imageHover = _rx2['default'].Observable.fromEvent($original, 'mousemove');
+	var imageLeave = _rx2['default'].Observable.fromEvent($original, 'mouseleave');
+	
+	var convert = imageHover.map(function (hover) {
+	  return { left: hover.clientX, top: hover.clientY };
+	}).debounce(10);
+	
+	var imageSubscribe = convert.subscribe(function (e) {
+	
+	  var top = e.top * -yRatio + offSets.top * yRatio,
+	      left = e.left * -xRatio + offSets.left * xRatio;
+	
+	  $zoomImage.css({ left: left, top: top });
+	  $zoom.css({ opacity: 1 });
+	});
+	
+	imageLeave.subscribe(function () {
+	  $zoom.css({ opacity: 0 });
+	});
 
 /***/ }
 /******/ ]);
