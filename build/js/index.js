@@ -62,64 +62,12 @@
 	 */
 	'use strict';
 	
-	__webpack_require__(/*! ./hover-zoom/hover-zoom */ 2);
+	__webpack_require__(/*! ./hover-zoom/hover-zoom-new */ 9);
 	__webpack_require__(/*! ./drag-drop/drag-drop */ 7);
 	__webpack_require__(/*! ./drag-drop-sort/drag-drop-sort */ 8);
 
 /***/ },
-/* 2 */
-/*!**************************************!*\
-  !*** ./src/hover-zoom/hover-zoom.js ***!
-  \**************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Created by cmdv on 16/06/15.
-	 */
-	'use strict';
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
-	var _rx = __webpack_require__(/*! rx */ 3);
-	
-	var _rx2 = _interopRequireDefault(_rx);
-	
-	var _jquery = __webpack_require__(/*! jquery */ 6);
-	
-	var _jquery2 = _interopRequireDefault(_jquery);
-	
-	var $original = (0, _jquery2['default'])('#c_image'),
-	    $zoom = (0, _jquery2['default'])('#c_zoom'),
-	    $zoomImage = (0, _jquery2['default'])('#c_zoom-image'),
-	    targetWidth = $zoom.outerWidth(),
-	    targetHeight = $zoom.outerHeight(),
-	    originalWidth = $original.width(),
-	    originalHeight = $original.height(),
-	    xRatio = ($zoomImage.width() - targetWidth) / originalWidth,
-	    yRatio = ($zoomImage.height() - targetHeight) / originalHeight,
-	    offSets = $original.offset();
-	
-	var imageHover = _rx2['default'].Observable.fromEvent($original, 'mousemove');
-	var imageLeave = _rx2['default'].Observable.fromEvent($original, 'mouseleave');
-	
-	var convert = imageHover.map(function (hover) {
-	  return { left: hover.clientX, top: hover.clientY };
-	}).debounce(10);
-	
-	var imageSubscribe = convert.subscribe(function (e) {
-	
-	  var top = e.top * -yRatio + offSets.top * yRatio,
-	      left = e.left * -xRatio + offSets.left * xRatio;
-	
-	  $zoomImage.css({ left: left, top: top });
-	  $zoom.css({ opacity: 1 });
-	});
-	
-	imageLeave.subscribe(function () {
-	  $zoom.css({ opacity: 0 });
-	});
-
-/***/ },
+/* 2 */,
 /* 3 */
 /*!*****************************!*\
   !*** ./~/rx/dist/rx.all.js ***!
@@ -20293,6 +20241,123 @@
 	
 	imageLeave.subscribe(function () {
 	  $zoom.css({ opacity: 0 });
+	});
+
+/***/ },
+/* 9 */
+/*!******************************************!*\
+  !*** ./src/hover-zoom/hover-zoom-new.js ***!
+  \******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	/**
+	 * Created by cmdv on 16/06/15.
+	 */
+	
+	var _rx = __webpack_require__(/*! rx */ 3);
+	
+	var _rx2 = _interopRequireDefault(_rx);
+	
+	var _jquery = __webpack_require__(/*! jquery */ 6);
+	
+	var _jquery2 = _interopRequireDefault(_jquery);
+	
+	var dw, dh, rw, rh, lx, ly;
+	
+	var $target = (0, _jquery2['default'])('.hoverzoom'),
+	    $flyout = (0, _jquery2['default'])('<div class="hoverzoom-flyout" />'),
+	    $link = $target.find('a'),
+	    $image = $target.find('img'),
+	    parentDiv = (0, _jquery2['default'])('.thumbnail'),
+	    zoom = new Image(),
+	    zoomed = {},
+	
+	// setting up Observable
+	mouseEnter = _rx2['default'].Observable.fromEvent($target, 'mouseenter'),
+	    mouseLeave = _rx2['default'].Observable.fromEvent($target, 'mouseleave'),
+	    targetClick = _rx2['default'].Observable.fromEvent($target, 'click');
+	
+	(function getStarted() {
+	
+	  var link = $link.attr('href');
+	
+	  $target.append($flyout);
+	  $flyout.append(zoom);
+	
+	  zoom.style.position = 'absolute';
+	  zoom.src = link;
+	
+	  zoomed = (0, _jquery2['default'])(zoom);
+	})();
+	
+	// prevent default clicks
+	var preventDefault = targetClick.subscribe(function (e) {
+	  e.preventDefault();
+	});
+	
+	// make sure $flyout is on DOM
+	var _onEnter = mouseEnter.filter(function () {
+	  return (0, _jquery2['default'])($flyout).length == 1;
+	});
+	
+	var _entered = _onEnter.map(function () {
+	
+	  var w1, h1, w2, h2, padding;
+	
+	  w1 = $target.width();
+	  h1 = $target.height();
+	
+	  w2 = $flyout.width();
+	  h2 = $flyout.height();
+	
+	  dw = zoomed.width() - w2;
+	  dh = zoomed.height() - h2;
+	
+	  rw = dw / w1;
+	  rh = dh / h1;
+	
+	  padding = parentDiv.outerWidth();
+	
+	  $flyout.css({ opacity: 1, left: padding, top: -20, width: w1, height: h1 });
+	}).filter(function () {
+	  return zoomed.width() != 0;
+	});
+	
+	var enterSubscribe = _entered.subscribe(function () {
+	
+	  zoomed.width() == 0 ? console.log('zero') : console.log('more');
+	
+	  var mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove').map(function (e) {
+	    lx = e.pageX || lx;
+	    ly = e.pageY || ly;
+	
+	    var offset = $target.offset(),
+	        pt = ly - offset.top,
+	        pl = lx - offset.left,
+	        xt = Math.ceil(pt * rh),
+	        xl = Math.ceil(pl * rw),
+	        top = xt * -1,
+	        left = xl * -1;
+	
+	    console.log(xt);
+	    console.log(xl);
+	
+	    return { top: top, left: left };
+	  });
+	
+	  var moveSubscribe = mouseMove.subscribe(function (a) {
+	
+	    zoomed.css({ top: a.top, left: a.left });
+	  });
+	});
+	
+	mouseLeave.subscribe(function () {
+	  console.log('left now');
+	  $flyout.css({ opacity: 0 });
 	});
 
 /***/ }
