@@ -62,7 +62,7 @@
 	 */
 	'use strict';
 	
-	__webpack_require__(/*! ./hover-zoom/hover-zoom-new */ 9);
+	__webpack_require__(/*! ./hover-zoom/hover-zoom */ 9);
 	__webpack_require__(/*! ./drag-drop/drag-drop */ 7);
 	__webpack_require__(/*! ./drag-drop-sort/drag-drop-sort */ 8);
 
@@ -20245,9 +20245,9 @@
 
 /***/ },
 /* 9 */
-/*!******************************************!*\
-  !*** ./src/hover-zoom/hover-zoom-new.js ***!
-  \******************************************/
+/*!**************************************!*\
+  !*** ./src/hover-zoom/hover-zoom.js ***!
+  \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20269,11 +20269,13 @@
 	var dw, dh, rw, rh, lx, ly;
 	
 	var $target = (0, _jquery2['default'])('.hoverzoom'),
+	    w1 = $target.width(),
+	    h1 = $target.height(),
 	    $flyout = (0, _jquery2['default'])('<div class="hoverzoom-flyout" />'),
 	    $link = $target.find('a'),
 	    $image = $target.find('img'),
 	    parentDiv = (0, _jquery2['default'])('.thumbnail'),
-	    zoom = new Image(),
+	    link = $link.attr('href'),
 	    zoomed = {},
 	
 	// setting up Observable
@@ -20283,15 +20285,17 @@
 	
 	(function getStarted() {
 	
-	  var link = $link.attr('href');
-	
-	  $target.append($flyout);
-	  $flyout.append(zoom);
+	  var zoom = document.createElement('img');
 	
 	  zoom.style.position = 'absolute';
 	  zoom.src = link;
 	
-	  zoomed = (0, _jquery2['default'])(zoom);
+	  $target.append($flyout);
+	  $flyout.append(zoom);
+	
+	  zoomed = (0, _jquery2['default'])('.hoverzoom-flyout').find('img');
+	
+	  $flyout.css({ width: w1, height: h1 });
 	})();
 	
 	// prevent default clicks
@@ -20306,12 +20310,12 @@
 	
 	var _entered = _onEnter.map(function () {
 	
-	  var w1, h1, w2, h2, padding;
-	
-	  w1 = $target.width();
-	  h1 = $target.height();
-	
-	  w2 = $flyout.width();
+	  var w2,
+	      h2,
+	      padding,
+	      w1 = $target.width(),
+	      h1 = $target.height(),
+	      w2 = $flyout.width();
 	  h2 = $flyout.height();
 	
 	  dw = zoomed.width() - w2;
@@ -20329,8 +20333,6 @@
 	
 	var enterSubscribe = _entered.subscribe(function () {
 	
-	  zoomed.width() == 0 ? console.log('zero') : console.log('more');
-	
 	  var mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove').map(function (e) {
 	    lx = e.pageX || lx;
 	    ly = e.pageY || ly;
@@ -20343,20 +20345,16 @@
 	        top = xt * -1,
 	        left = xl * -1;
 	
-	    console.log(xt);
-	    console.log(xl);
-	
 	    return { top: top, left: left };
 	  });
 	
 	  var moveSubscribe = mouseMove.subscribe(function (a) {
-	
 	    zoomed.css({ top: a.top, left: a.left });
 	  });
 	});
 	
+	// hide flyout
 	mouseLeave.subscribe(function () {
-	  console.log('left now');
 	  $flyout.css({ opacity: 0 });
 	});
 
