@@ -4,34 +4,42 @@
 import Rx from 'rx';
 import $ from 'jquery';
 
-var $original       = $('#c_image'),
-    $zoom           = $('#c_zoom'),
-    $zoomImage      = $('#c_zoom-image'),
-    targetWidth     = $zoom.outerWidth(),
-    targetHeight    = $zoom.outerHeight(),
-    originalWidth   = $original.width(),
-    originalHeight  = $original.height(),
-    xRatio          = ($zoomImage.width() - targetWidth) / originalWidth,
-    yRatio          = ($zoomImage.height() - targetHeight) / originalHeight,
-    offSets         = $original.offset();
+var $dragTarget = $('.dragTarget');
+var $dragArea = $('.dragArea');
+
+// Get the three major events
+var mouseup = Rx.Observable.fromEvent($dragTarget, 'mouseup');
+var mousemove = Rx.Observable.fromEvent(document, 'mousemove');
+var mousedown = Rx.Observable.fromEvent($dragTarget, 'mousedown');
 
 
-var imageHover = Rx.Observable.fromEvent($original, 'mousemove');
-var imageLeave = Rx.Observable.fromEvent($original, 'mouseleave');
+var _mouseUp = mouseup.subscribe(() => console.log('mouseup'));
 
-var convert = imageHover.map((hover) => {
-  return {left: hover.clientX, top: hover.clientY}
-}).debounce(10);
+var mousedrag = mousedown.flatMap(function (e) {
 
-var imageSubscribe = convert.subscribe((e) => {
 
-  var top = (e.top * -yRatio) + (offSets.top * yRatio),
-      left = (e.left * -xRatio) + (offSets.left * xRatio);
+  // calculate offsets when mouse down
+  var startX = e.offsetX, startY = e.offsetY;
 
-  $zoomImage.css({left: left, top: top});
-  $zoom.css({opacity: 1});
+  // Calculate delta with mousemove until mouseup
+  return mousemove.map(function (mm) {
+    mm.preventDefault();
+
+    // accommodate for site header and sidebar
+    var offsets = $dragArea.offset();
+
+    return {
+      left: mm.clientX - startX - offsets.left,
+      top: mm.clientY - startY - offsets.top
+    };
+  }).takeUntil(mouseup);
 });
 
-imageLeave.subscribe(() => {
-  $zoom.css({opacity: 0});
+// Update position
+var subscription = mousedrag.subscribe(function (pos) {
+
+  $dragTarget.css({top: pos.top, left: pos.left});
+
 });
+
+
