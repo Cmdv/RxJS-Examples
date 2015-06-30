@@ -62,35 +62,42 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var $original = (0, _jquery2['default'])('#c_image'),
-	    $zoom = (0, _jquery2['default'])('#c_zoom'),
-	    $zoomImage = (0, _jquery2['default'])('#c_zoom-image'),
-	    targetWidth = $zoom.outerWidth(),
-	    targetHeight = $zoom.outerHeight(),
-	    originalWidth = $original.width(),
-	    originalHeight = $original.height(),
-	    xRatio = ($zoomImage.width() - targetWidth) / originalWidth,
-	    yRatio = ($zoomImage.height() - targetHeight) / originalHeight,
-	    offSets = $original.offset();
+	var $dragTarget = (0, _jquery2['default'])('.dragTarget');
+	var $dragArea = (0, _jquery2['default'])('.dragArea');
 	
-	var imageHover = _rx2['default'].Observable.fromEvent($original, 'mousemove');
-	var imageLeave = _rx2['default'].Observable.fromEvent($original, 'mouseleave');
+	// Get the three major events
+	var mouseup = _rx2['default'].Observable.fromEvent($dragTarget, 'mouseup');
+	var mousemove = _rx2['default'].Observable.fromEvent(document, 'mousemove');
+	var mousedown = _rx2['default'].Observable.fromEvent($dragTarget, 'mousedown');
 	
-	var convert = imageHover.map(function (hover) {
-	  return { left: hover.clientX, top: hover.clientY };
-	}).debounce(10);
-	
-	var imageSubscribe = convert.subscribe(function (e) {
-	
-	  var top = e.top * -yRatio + offSets.top * yRatio,
-	      left = e.left * -xRatio + offSets.left * xRatio;
-	
-	  $zoomImage.css({ left: left, top: top });
-	  $zoom.css({ opacity: 1 });
+	var _mouseUp = mouseup.subscribe(function () {
+	  return console.log('mouseup');
 	});
 	
-	imageLeave.subscribe(function () {
-	  $zoom.css({ opacity: 0 });
+	var mousedrag = mousedown.flatMap(function (e) {
+	
+	  // calculate offsets when mouse down
+	  var startX = e.offsetX,
+	      startY = e.offsetY;
+	
+	  // Calculate delta with mousemove until mouseup
+	  return mousemove.map(function (mm) {
+	    mm.preventDefault();
+	
+	    // accommodate for site header and sidebar
+	    var offsets = $dragArea.offset();
+	
+	    return {
+	      left: mm.clientX - startX - offsets.left,
+	      top: mm.clientY - startY - offsets.top
+	    };
+	  }).takeUntil(mouseup);
+	});
+	
+	// Update position
+	var subscription = mousedrag.subscribe(function (pos) {
+	
+	  $dragTarget.css({ top: pos.top, left: pos.left });
 	});
 
 /***/ },

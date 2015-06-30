@@ -47,13 +47,13 @@
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-	
 	/**
 	 * Created by cmdv on 16/06/15.
 	 */
+	
+	'use strict';
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _rx = __webpack_require__(/*! rx */ 1);
 	
@@ -63,9 +63,10 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var dw, dh, rw, rh, lx, ly;
+	var dw, dh, rw, rh, lx, ly, w2, h2, padding;
 	
 	var $target = (0, _jquery2['default'])('.hoverzoom'),
+	    $showZoom = (0, _jquery2['default'])('.showzoom'),
 	    w1 = $target.width(),
 	    h1 = $target.height(),
 	    $flyout = (0, _jquery2['default'])('<div class="hoverzoom-flyout" />'),
@@ -78,16 +79,17 @@
 	// setting up Observable
 	mouseEnter = _rx2['default'].Observable.fromEvent($target, 'mouseenter'),
 	    mouseLeave = _rx2['default'].Observable.fromEvent($target, 'mouseleave'),
+	    mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove'),
 	    targetClick = _rx2['default'].Observable.fromEvent($target, 'click');
 	
-	(function getStarted() {
+	(function letsGo() {
 	
 	  var zoom = document.createElement('img');
 	
 	  zoom.style.position = 'absolute';
 	  zoom.src = link;
 	
-	  $target.append($flyout);
+	  $showZoom.append($flyout);
 	  $flyout.append(zoom);
 	
 	  zoomed = (0, _jquery2['default'])('.hoverzoom-flyout').find('img');
@@ -103,24 +105,18 @@
 	// make sure $flyout is on DOM
 	var _onEnter = mouseEnter.filter(function () {
 	  return (0, _jquery2['default'])($flyout).length == 1;
-	});
+	}).map(function (e) {
 	
-	var _entered = _onEnter.map(function () {
+	  e.stopPropagation();
 	
-	  var w2,
-	      h2,
-	      padding,
-	      w1 = $target.width(),
-	      h1 = $target.height(),
-	      w2 = $flyout.width();
+	  w1 = $target.width();
+	  h1 = $target.height();
+	  w2 = $flyout.width();
 	  h2 = $flyout.height();
-	
 	  dw = zoomed.width() - w2;
 	  dh = zoomed.height() - h2;
-	
 	  rw = dw / w1;
 	  rh = dh / h1;
-	
 	  padding = parentDiv.outerWidth();
 	
 	  $flyout.css({ opacity: 1, left: padding, top: -20, width: w1, height: h1 });
@@ -128,31 +124,30 @@
 	  return zoomed.width() != 0;
 	});
 	
-	var enterSubscribe = _entered.subscribe(function () {
+	var enterSubscribe = _onEnter.subscribe();
 	
-	  var mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove').map(function (e) {
-	    lx = e.pageX || lx;
-	    ly = e.pageY || ly;
+	var _onMove = mouseMove.map(function (e) {
+	  lx = e.pageX || lx;
+	  ly = e.pageY || ly;
 	
-	    var offset = $target.offset(),
-	        pt = ly - offset.top,
-	        pl = lx - offset.left,
-	        xt = Math.ceil(pt * rh),
-	        xl = Math.ceil(pl * rw),
-	        top = xt * -1,
-	        left = xl * -1;
+	  var offset = $target.offset(),
+	      pt = ly - offset.top,
+	      pl = lx - offset.left,
+	      xt = Math.ceil(pt * rh),
+	      xl = Math.ceil(pl * rw),
+	      top = xt * -1,
+	      left = xl * -1;
 	
-	    return { top: top, left: left };
-	  });
+	  return { top: top, left: left };
+	});
 	
-	  var moveSubscribe = mouseMove.subscribe(function (a) {
-	    zoomed.css({ top: a.top, left: a.left });
-	  });
+	var moveSubscribe = _onMove.subscribe(function (a) {
+	  return zoomed.css({ top: a.top, left: a.left });
 	});
 	
 	// hide flyout
 	mouseLeave.subscribe(function () {
-	  $flyout.css({ opacity: 0 });
+	  return $flyout.css({ opacity: 0 });
 	});
 
 /***/ },

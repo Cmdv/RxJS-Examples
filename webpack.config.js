@@ -2,13 +2,16 @@ var path = require('path');
 
 module.exports = {
 
-  entry: [
-    './src/index'
-  ],
+  entry: {
+   dragdrop:  './src/drag-drop/drag-drop',
+   hoverzoom:  './src/hover-zoom/hover-zoom'
+
+
+  },
 
   output: {
     path: path.join(__dirname, 'build/js'),
-    filename: 'index.js'
+    filename: '[name].js'
   },
 
   module: {
