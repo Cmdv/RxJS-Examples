@@ -9,11 +9,13 @@ import $ from 'jquery';
 var dw, dh, rw, rh, lx, ly;
 
 var $target = $('.hoverzoom'),
+  w1 = $target.width(),
+  h1 = $target.height(),
   $flyout = $('<div class="hoverzoom-flyout" />'),
   $link = $target.find('a'),
   $image = $target.find('img'),
   parentDiv = $('.thumbnail'),
-  zoom = new Image,
+  link = $link.attr('href'),
   zoomed = {},
 
 // setting up Observable
@@ -22,17 +24,21 @@ var $target = $('.hoverzoom'),
   targetClick = Rx.Observable.fromEvent($target, 'click');
 
 
-(function getStarted () {
+(function getStarted() {
 
-  var link = $link.attr('href');
-
-  $target.append($flyout);
-  $flyout.append(zoom);
+  var zoom = document.createElement("img");
 
   zoom.style.position = 'absolute';
   zoom.src = link;
 
-  zoomed = $(zoom);
+  $target.append($flyout);
+  $flyout.append(zoom);
+
+  zoomed = $('.hoverzoom-flyout').find('img');
+
+  $flyout.css({width: w1, height: h1});
+
+  console.log(zoomed);
 
 })();
 
@@ -47,33 +53,29 @@ var _onEnter = mouseEnter.filter(() => $($flyout).length == 1);
 
 var _entered = _onEnter.map(() => {
 
-    var w1, h1, w2, h2, padding;
+  var w2, h2, padding;
 
-    w1 = $target.width();
-    h1 = $target.height();
+  w2 = $flyout.width();
+  h2 = $flyout.height();
 
-    w2 = $flyout.width();
-    h2 = $flyout.height();
+  dw = zoomed.width() - w2;
+  dh = zoomed.height() - h2;
 
-    dw = zoomed.width() - w2;
-    dh = zoomed.height() - h2;
+  rw = dw / w1;
+  rh = dh / h1;
 
-    rw = dw / w1;
-    rh = dh / h1;
+  padding = parentDiv.outerWidth();
 
-    padding = parentDiv.outerWidth();
+  $flyout.css({opacity: 1, left: padding, top: -20, width: w1, height: h1});
 
-    $flyout.css({opacity: 1, left: padding, top: -20, width: w1, height: h1});
-
-  }).filter( ()=> zoomed.width() != 0 );
-
+}).filter(()=> zoomed.width() != 0);
 
 
 var enterSubscribe = _entered.subscribe(() => {
 
   zoomed.width() == 0 ? console.log('zero') : console.log('more');
 
-  var mouseMove = Rx.Observable.fromEvent($target, 'mousemove').map((e) =>{
+  var mouseMove = Rx.Observable.fromEvent($target, 'mousemove').map((e) => {
     lx = e.pageX || lx;
     ly = e.pageY || ly;
 
@@ -85,8 +87,7 @@ var enterSubscribe = _entered.subscribe(() => {
       top = xt * -1,
       left = xl * -1;
 
-    console.log(xt);
-    console.log(xl);
+    console.log(zoomed.width());
 
     return {top, left}
 
