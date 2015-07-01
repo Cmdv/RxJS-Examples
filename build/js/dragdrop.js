@@ -71,11 +71,12 @@
 	var mousedown = _rx2['default'].Observable.fromEvent($dragTarget, 'mousedown');
 	
 	var _mouseUp = mouseup.subscribe(function () {
-	  return console.log('mouseup');
+	  return $dragTarget.css({ cursor: '-webkit-grab' });
 	});
 	
 	var mousedrag = mousedown.flatMap(function (e) {
 	
+	  $dragTarget.css({ cursor: '-webkit-grabbing' });
 	  // calculate offsets when mouse down
 	  var startX = e.offsetX,
 	      startY = e.offsetY;

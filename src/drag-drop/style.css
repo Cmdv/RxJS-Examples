@@ -10,5 +10,5 @@
     color: #ffffff;
     padding: 10px;
     position: absolute;
-    cursor: move;
+    cursor: -webkit-grab;
 }

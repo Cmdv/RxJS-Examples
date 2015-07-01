@@ -13,11 +13,11 @@ var mousemove = Rx.Observable.fromEvent(document, 'mousemove');
 var mousedown = Rx.Observable.fromEvent($dragTarget, 'mousedown');
 
 
-var _mouseUp = mouseup.subscribe(() => console.log('mouseup'));
+var _mouseUp = mouseup.subscribe(() => $dragTarget.css({cursor:'-webkit-grab'}) );
 
 var mousedrag = mousedown.flatMap(function (e) {
 
-
+  $dragTarget.css({cursor:'-webkit-grabbing'});
   // calculate offsets when mouse down
   var startX = e.offsetX, startY = e.offsetY;
 
@@ -37,6 +37,7 @@ var mousedrag = mousedown.flatMap(function (e) {
 
 // Update position
 var subscription = mousedrag.subscribe(function (pos) {
+
 
   $dragTarget.css({top: pos.top, left: pos.left});
 
