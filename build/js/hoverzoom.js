@@ -63,89 +63,97 @@
 	
 	var _jquery2 = _interopRequireDefault(_jquery);
 	
-	var dw, dh, rw, rh, lx, ly, w2, h2, padding;
+	var dw, dh, rw, rh, lx, ly, w1, h1, w2, h2, padding;
 	
 	var $target = (0, _jquery2['default'])('.hoverzoom'),
-	    $showZoom = (0, _jquery2['default'])('.showzoom'),
-	    w1 = $target.width(),
-	    h1 = $target.height(),
-	    $flyout = (0, _jquery2['default'])('<div class="hoverzoom-flyout" />'),
+	    $showZoomDiv = (0, _jquery2['default'])('.showzoom'),
+	    hoverZoomImage = 'hoverzoom-img',
+	    hoverZoomflyout = 'hoverzoom-flyout',
+	    $flyout,
 	    $link = $target.find('a'),
 	    $image = $target.find('img'),
 	    parentDiv = (0, _jquery2['default'])('.thumbnail'),
 	    link = $link.attr('href'),
-	    zoomed = {},
+	    $zoomImage,
 	
 	// setting up Observable
 	mouseEnter = _rx2['default'].Observable.fromEvent($target, 'mouseenter'),
 	    mouseLeave = _rx2['default'].Observable.fromEvent($target, 'mouseleave'),
-	    mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove'),
-	    targetClick = _rx2['default'].Observable.fromEvent($target, 'click');
 	
-	(function letsGo() {
-	
-	  var zoom = document.createElement('img');
-	
-	  zoom.style.position = 'absolute';
-	  zoom.src = link;
-	
-	  $showZoom.append($flyout);
-	  $flyout.append(zoom);
-	
-	  zoomed = (0, _jquery2['default'])('.hoverzoom-flyout').find('img');
-	
-	  $flyout.css({ width: w1, height: h1 });
-	})();
-	
-	// prevent default clicks
-	var preventDefault = targetClick.subscribe(function (e) {
-	  e.preventDefault();
+	// prevent default clicks on target image
+	targetClick = _rx2['default'].Observable.fromEvent($target, 'click').subscribe(function (e) {
+	  return e.preventDefault();
 	});
 	
-	// make sure $flyout is on DOM
-	var _onEnter = mouseEnter.filter(function () {
-	  return (0, _jquery2['default'])($flyout).length == 1;
-	}).map(function (e) {
-	
+	// Prepare elements onmouseenter and subscription
+	var _onEnter = mouseEnter.map(function (e) {
 	  e.stopPropagation();
+	
+	  //check if previous element is already there
+	  $flyout != undefined ? $flyout.remove() : '';
+	
+	  var zoomImage = document.createElement('img'),
+	      zoomFlyout = document.createElement('div');
+	  zoomFlyout.className = hoverZoomflyout;
+	  zoomImage.className = hoverZoomImage;
+	  zoomImage.src = link;
+	  zoomImage.style.position = 'absolute';
+	
+	  (0, _jquery2['default'])(zoomFlyout).append(zoomImage);
+	  $flyout = (0, _jquery2['default'])(zoomFlyout);
+	  $showZoomDiv.append($flyout);
+	
+	  //wait for zoomImage to be loaded then break off to deal with mousemove
+	  (0, _jquery2['default'])(zoomImage).load(function () {
+	    return _setUpMove();
+	  });
+	}).subscribe();
+	
+	// get all the positions calculated and setup
+	var _setUpMove = function _setUpMove() {
+	
+	  $zoomImage = (0, _jquery2['default'])('.' + hoverZoomImage);
 	
 	  w1 = $target.width();
 	  h1 = $target.height();
-	  w2 = $flyout.width();
-	  h2 = $flyout.height();
-	  dw = zoomed.width() - w2;
-	  dh = zoomed.height() - h2;
-	  rw = dw / w1;
-	  rh = dh / h1;
 	  padding = parentDiv.outerWidth();
 	
 	  $flyout.css({ opacity: 1, left: padding, top: -20, width: w1, height: h1 });
-	}).filter(function () {
-	  return zoomed.width() != 0;
-	});
 	
-	var enterSubscribe = _onEnter.subscribe();
+	  w2 = $flyout.width();
+	  h2 = $flyout.height();
+	  dw = $zoomImage.width() - w2;
+	  dh = $zoomImage.height() - h2;
+	  rw = dw / w1;
+	  rh = dh / h1;
 	
-	var _onMove = mouseMove.map(function (e) {
-	  lx = e.pageX || lx;
-	  ly = e.pageY || ly;
+	  _startMoving();
+	};
 	
-	  var offset = $target.offset(),
-	      pt = ly - offset.top,
-	      pl = lx - offset.left,
-	      xt = Math.ceil(pt * rh),
-	      xl = Math.ceil(pl * rw),
-	      top = xt * -1,
-	      left = xl * -1;
+	var _startMoving = function _startMoving() {
+	  //create an observable for mousemoves
+	  var mouseMove = _rx2['default'].Observable.fromEvent($target, 'mousemove'),
+	      _onMove = mouseMove.map(function (e) {
+	    lx = e.pageX || lx;
+	    ly = e.pageY || ly;
 	
-	  return { top: top, left: left };
-	});
+	    var offset = $target.offset(),
+	        pt = ly - offset.top,
+	        pl = lx - offset.left,
+	        xt = Math.ceil(pt * rh),
+	        xl = Math.ceil(pl * rw),
+	        top = xt * -1,
+	        left = xl * -1;
 	
-	var moveSubscribe = _onMove.subscribe(function (a) {
-	  return zoomed.css({ top: a.top, left: a.left });
-	});
+	    return { top: top, left: left };
+	  });
+	  //subscribe to mousemove and move zoomImage
+	  var moveSubscribe = _onMove.subscribe(function (a) {
+	    return $zoomImage.css({ top: a.top, left: a.left });
+	  });
+	};
 	
-	// hide flyout
+	// subscribe to mouseleave and hide flyout
 	mouseLeave.subscribe(function () {
 	  return $flyout.css({ opacity: 0 });
 	});
